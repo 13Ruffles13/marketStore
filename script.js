@@ -1,5 +1,6 @@
 const totalPriceElement = document.getElementById("totalPrice");
 const parentListElement = document.getElementById("list");
+
 let totalPrice = 0;
 let cart = [];
 
@@ -8,6 +9,30 @@ class Item{
     this.name = name;
     this.price = price;
   }
+}
+
+const totalPriceStorage = localStorage.getItem("totalPrice");
+if(totalPriceStorage !== null){
+  totalPrice = parseInt(totalPriceStorage);
+}
+
+//List of objects that needs to be converted to a item
+const cartStorage = localStorage.getItem("cart");
+if(cartStorage !== null){
+  let newCart = [];
+  
+  JSON.parse(cartStorage).forEach((item) =>{
+    newCart.push(new Item(item.name, item.price))
+  });
+
+  cart = newCart;
+
+  refreshUI();
+}
+
+function updateStorage(){
+  localStorage.setItem("totalPrice", totalPrice);
+  localStorage.setItem("cart", JSON.stringify(cart));
 }
 
 function refreshUI(){
@@ -31,6 +56,7 @@ function refreshUI(){
     deleteButton.addEventListener("click", () => {
       cart.splice(index, 1);
       totalPrice -= item.price;
+      updateStorage();
       refreshUI();
     });
   });
@@ -44,6 +70,11 @@ function addItem(form) {
   const item = new Item(itemName, parseInt(itemPrice));
   cart.push(item);
 
+  //List of objects
+  localStorage.setItem("totalPrice", totalPrice);
+  localStorage.setItem("cart", JSON.stringify(cart));
+
+  updateStorage();
   refreshUI();
 
   return false;
